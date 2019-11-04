@@ -115,7 +115,7 @@ import static com.zhuchao.android.tianpuhw.utils.PageType.RECENT_TYPE;
 /**
  *
  */
-public class MainActivity extends AppCompatActivity implements View.OnFocusChangeListener,
+public class MainActivity extends AppCompatActivity implements View.OnFocusChangeListener, ViewTreeObserver.OnGlobalFocusChangeListener,
         View.OnClickListener, TimeHandler.OnTimeDateListener, NetTool.OnNetListener,
         AppHandler.OnScanListener, AppHandler.OnAddRemoeveListener,
         View.OnKeyListener, AppHandler.OnBottomListener, WallperHandler.OnWallperUpdateListener, ServiceConnection {
@@ -342,93 +342,7 @@ public class MainActivity extends AppCompatActivity implements View.OnFocusChang
 //        binding.flAdd1.setOnLongClickListener(this);
 
         selEffectBridge = (SelEffectBridge) binding.mainUpView.getEffectBridge();
-        binding.topInfo.getViewTreeObserver().addOnGlobalFocusChangeListener(
-                new ViewTreeObserver.OnGlobalFocusChangeListener() {
-                    @Override
-                    public void onGlobalFocusChanged(View oldFocus, View newFocus) {
-//                        Log.e(TAG, "onGlobalFocusChanged " + newFocus + " " + oldFocus);
-                        if (newFocus == null) {
-                            return;
-                        }
-
-                        int focusVId = newFocus.getId();
-
-                        if (focusVId == R.id.fl7) {
-                            binding.mac.setVisibility(View.VISIBLE);
-                        } else {
-                            binding.mac.setVisibility(View.GONE);
-                        }
-
-
-                        switch (focusVId) {
-                            case R.id.ad:
-                                selEffectBridge.setUpRectResource(R.drawable.home_sel_btn);
-                                selEffectBridge.setVisibleWidget(false);
-                                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.1f);
-                                newFocus.bringToFront();
-                                break;
-                            case R.id.fl1:
-                            case R.id.fl3:
-                            case R.id.fl2:
-//                            case R.id.fl4:
-                            case R.id.history_fl:
-                                selEffectBridge.setUpRectResource(R.drawable.home_sel_btn);
-                                selEffectBridge.setVisibleWidget(false);
-                                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.3f);
-                                newFocus.bringToFront();
-//                                if (isDefault) {
-//                                    binding.fl16.requestFocus();
-//                                    isDefault = false;
-//                                }
-                                break;
-                            case R.id.fl_add1:
-                            case R.id.fl6:
-                            case R.id.fl7:
-                            case R.id.fl8:
-                                selEffectBridge.setUpRectResource(R.drawable.home_sel_btn);
-                                selEffectBridge.setVisibleWidget(false);
-                                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
-                                newFocus.bringToFront();
-//                                if (isDefault) {
-//                                    binding.fl16.requestFocus();
-//                                    isDefault = false;
-//                                }
-                                break;
-                            case R.id.fl5:
-                                selEffectBridge.setUpRectResource(R.drawable.but);
-
-                                //false是选中通道选择是的白框显示，true就是不显示
-                                selEffectBridge.setVisibleWidget(false);
-
-                                //1.1f是通道选择框的大小
-                                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.1f);
-                                newFocus.bringToFront();
-                                break;
-                            case R.id.fl12:
-                            case R.id.fl13:
-                            case R.id.fl14:
-                            case R.id.fl15:
-                                selEffectBridge.setUpRectResource(R.drawable.bgmbgm);
-                                selEffectBridge.setVisibleWidget(false);
-                                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
-                                newFocus.bringToFront();
-                                break;
-                            case R.id.fl11:
-                                selEffectBridge.setUpRectResource(R.drawable.left);
-                                selEffectBridge.setVisibleWidget(false);
-                                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
-                                newFocus.bringToFront();
-                                break;
-                            case R.id.fl16:
-                                selEffectBridge.setUpRectResource(R.drawable.right);
-                                selEffectBridge.setVisibleWidget(false);
-                                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
-                                newFocus.bringToFront();
-                                break;
-                        }
-//                        binding.fl16.requestFocus();
-                    }
-                });
+        binding.rlApp.getViewTreeObserver().addOnGlobalFocusChangeListener(this);
 
         //时间更新
         timeHandler = new TimeHandler(this);
@@ -493,7 +407,6 @@ public class MainActivity extends AppCompatActivity implements View.OnFocusChang
         startService(iii);
 
         requestPermition();
-        setupFocuce();
 
 
         new Thread() {
@@ -510,35 +423,6 @@ public class MainActivity extends AppCompatActivity implements View.OnFocusChang
                 }
             }
         }.start();
-    }
-
-    private void setupFocuce() {
-        //默认焦点
-        new Thread() {
-            @Override
-            public void run() {
-                super.run();
-                try {
-
-                    sleep(4000);
-/*                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            binding.fl16.requestFocus();
-                            //onFocusChange(binding.fl1,true);
-                        }
-                    });*/
-                    //binding.fl1.requestFocus();
-                    sendKeyEvent(KeyEvent.KEYCODE_DPAD_DOWN);
-                    //binding.fl1.requestFocus();
-                    //sleep(500);
-                    //sendKeyEvent(KeyEvent.KEYCODE_DPAD_UP);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.start();
-
     }
 
 
@@ -873,30 +757,21 @@ public class MainActivity extends AppCompatActivity implements View.OnFocusChang
             }
         });
 
-
         binding.adBg.startAutoPlay();
-
         registerHomeKeyReceiver(this);
 
+        View rootview = this.getWindow().getDecorView();
+        View v = rootview.findFocus();
 
-//        if (!isFirstResume) {
-//            isFirstResume = false;
-            new Handler().postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    if (binding.mainRl.hasFocus() ||
-                            binding.topInfo.getFocusedChild() != null ||
-                            binding.rlApp.getFocusedChild() != null) return;
-                    binding.fl2.setFocusable(true);
-                    binding.fl2.requestFocus();
-//                selEffectBridge.setUpRectResource(R.drawable.home_sel_btn);
-//                selEffectBridge.setVisibleWidget(false);
-//                binding.mainUpView.setFocusView(binding.fl1, null, 1.3f);
-//                binding.fl1.bringToFront();
-                    Log.e("resume", "request focus");
-                }
-            }, 1000);
-//        }
+        if (v != null) {
+            v.requestFocus();
+
+
+        }  else {
+            binding.fl1.setFocusable(true);
+            binding.fl1.requestFocus();
+            onGlobalFocusChanged(null, binding.fl1);
+        }
 
     }
 
@@ -3000,6 +2875,84 @@ public class MainActivity extends AppCompatActivity implements View.OnFocusChang
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_PHONE_STATE},
                         0);
             }
+        }
+    }
+
+    @Override
+    public void onGlobalFocusChanged(View oldFocus, View newFocus)
+    {
+        if (newFocus == null) {
+            return;
+        }
+        int focusVId = newFocus.getId();
+
+        if (focusVId == R.id.fl7) {
+           // binding.mac.setVisibility(View.VISIBLE);
+        } else {
+          //  binding.mac.setVisibility(View.GONE);
+        }
+
+
+        switch (focusVId) {
+            case R.id.ad:
+                selEffectBridge.setUpRectResource(R.drawable.home_sel_btn);
+                selEffectBridge.setVisibleWidget(false);
+                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.1f);
+                newFocus.bringToFront();
+                break;
+            case R.id.fl1:
+            case R.id.fl3:
+            case R.id.fl2:
+            case R.id.history_fl:
+                selEffectBridge.setUpRectResource(R.drawable.home_sel_btn);
+                selEffectBridge.setVisibleWidget(false);
+                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.3f);
+                newFocus.bringToFront();
+                break;
+            case R.id.fl_add1:
+            case R.id.fl6:
+            case R.id.fl7:
+            case R.id.fl8:
+                selEffectBridge.setUpRectResource(R.drawable.home_sel_btn);
+                selEffectBridge.setVisibleWidget(false);
+                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
+                newFocus.bringToFront();
+//                                if (isDefault) {
+//                                    binding.fl16.requestFocus();
+//                                    isDefault = false;
+//                                }
+                break;
+            case R.id.fl5:
+                selEffectBridge.setUpRectResource(R.drawable.but);
+
+                //false是选中通道选择是的白框显示，true就是不显示
+                selEffectBridge.setVisibleWidget(false);
+
+                //1.1f是通道选择框的大小
+                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.1f);
+                newFocus.bringToFront();
+                break;
+            case R.id.fl12:
+            case R.id.fl13:
+            case R.id.fl14:
+            case R.id.fl15:
+                selEffectBridge.setUpRectResource(R.drawable.bgmbgm);
+                selEffectBridge.setVisibleWidget(false);
+                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
+                newFocus.bringToFront();
+                break;
+            case R.id.fl11:
+                selEffectBridge.setUpRectResource(R.drawable.left);
+                selEffectBridge.setVisibleWidget(false);
+                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
+                newFocus.bringToFront();
+                break;
+            case R.id.fl16:
+                selEffectBridge.setUpRectResource(R.drawable.right);
+                selEffectBridge.setVisibleWidget(false);
+                binding.mainUpView.setFocusView(newFocus, oldFocus, 1.2f);
+                newFocus.bringToFront();
+                break;
         }
     }
 
