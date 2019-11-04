@@ -27,8 +27,8 @@ android {
         applicationId "com.zhuchao.android.tianpuhw"
         minSdkVersion 22
         targetSdkVersion 28
-        versionCode 66
-        versionName "6.6"
+        versionCode 67
+        versionName "6.7"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
 
